@@ -2,9 +2,12 @@ package org.example.addressbook.controllers;
 
 import org.example.addressbook.model.AddressBook;
 import org.example.addressbook.repository.AddressBookRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1")
@@ -26,8 +29,12 @@ public class AddressBookController {
     }
 
     @GetMapping("addressbooks")
-    public Flux<AddressBook> getAddressBooks(){
-        return repository.findAll();
+    public Flux<AddressBook> getAddressBooks(@RequestParam Optional<Integer> pageOpt,
+                                             @RequestParam Optional<Integer> sizeOpt){
+        Integer page = pageOpt.orElse(0);
+        Integer size = sizeOpt.orElse(100);
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return repository.findAllBy(pageRequest);
     }
 
     @PostMapping("addressbooks")
